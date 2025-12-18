@@ -1,0 +1,48 @@
+# ========================
+# Python virtual environments
+# ========================
+venv/
+env/
+.venv/
+llm-scratch/
+llm-scratch-env/
+
+# ========================
+# Python cache
+# ========================
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# ========================
+# Jupyter
+# ========================
+.ipynb_checkpoints/
+
+# ========================
+# OS files
+# ========================
+.DS_Store
+Thumbs.db
+
+# ========================
+# Training artifacts
+# ========================
+*.pt
+*.pth
+*.ckpt
+*.log
+
+# ========================
+# Experiment outputs
+# ========================
+runs/
+outputs/
+
+# ========================
+# IDEs
+# ========================
+.vscode/
+.idea/
+
