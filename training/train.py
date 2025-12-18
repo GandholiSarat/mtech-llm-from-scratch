@@ -1,14 +1,22 @@
-import torch
+from data.dataset import TextDataset, CharTokenizer
 
 def main():
-    print("PyTorch version:", torch.__version__)
-    print("CUDA available:", torch.cuda.is_available())
+    with open("data/input.txt", "r", encoding="utf-8") as f:
+        text = f.read()
 
-    x = torch.randn(2, 3)
-    y = torch.randn(3, 4)
+    tokenizer = CharTokenizer(text)
+    dataset = TextDataset(
+        text=text,
+        tokenizer=tokenizer,
+        context_length=32
+    )
 
-    z = x @ y
-    print("Matrix multiply works:", z.shape)
+    x, y = dataset[0]
+
+    print("Input shape:", x.shape)
+    print("Target shape:", y.shape)
+    print("Decoded input:", tokenizer.decode(x.tolist()))
+    print("Decoded target:", tokenizer.decode(y.tolist()))
 
 if __name__ == "__main__":
     main()
