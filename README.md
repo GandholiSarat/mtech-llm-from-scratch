@@ -20,3 +20,10 @@ Sebastian Raschka’s "LLMs-from-scratch" repository.
 - Project structure initialized
 - CPU-only environment verified
 
+## Setup
+
+```bash
+python -m venv llm-scratch
+source llm-scratch/bin/activate
+pip install -r requirements.txt
+
