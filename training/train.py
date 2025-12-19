@@ -2,6 +2,7 @@ import torch
 from tokenizer.tokenizer import TikTokenWrapper
 from data.dataset import TextDataset
 from model.embedding import TokenAndPositionEmbedding
+from model.attention import CausalSelfAttention
 
 def main():
     with open("data/input.txt", "r", encoding="utf-8") as f:
@@ -10,14 +11,9 @@ def main():
     tokenizer = TikTokenWrapper("gpt2")
     vocab_size = tokenizer.vocab_size
 
-    dataset = TextDataset(
-        text=text,
-        tokenizer=tokenizer,
-        context_length=32
-    )
-
+    dataset = TextDataset(text, tokenizer, context_length=32)
     x, _ = dataset[0]
-    x = x.unsqueeze(0)  # add batch dimension
+    x = x.unsqueeze(0)  # (B=1, T)
 
     embedding = TokenAndPositionEmbedding(
         vocab_size=vocab_size,
@@ -25,10 +21,13 @@ def main():
         context_length=32
     )
 
-    out = embedding(x)
+    attn = CausalSelfAttention(embed_dim=128)
 
-    print("Input shape:", x.shape)
-    print("Embedding output shape:", out.shape)
+    x_emb = embedding(x)
+    out = attn(x_emb)
+
+    print("Embedding shape:", x_emb.shape)
+    print("Attention output shape:", out.shape)
 
 if __name__ == "__main__":
     main()
