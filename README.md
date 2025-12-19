@@ -52,7 +52,7 @@ mtech-llm-from-scratch/
 │   └── day03_tokenizer.md
 ├── requirements.txt
 └── README.md
-
+```
 ## Setup 
 
 ```bash
