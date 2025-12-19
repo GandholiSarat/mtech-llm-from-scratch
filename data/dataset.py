@@ -1,6 +1,7 @@
 import torch
 from torch.utils.data import Dataset
 
+'''
 class CharTokenizer:
     def __init__(self, text):
         chars = sorted(list(set(text)))
@@ -13,7 +14,7 @@ class CharTokenizer:
     def decode(self, tokens):
         return "".join([self.itos[t] for t in tokens])
 
-
+'''
 class TextDataset(Dataset):
     def __init__(self, text, tokenizer, context_length):
         """
