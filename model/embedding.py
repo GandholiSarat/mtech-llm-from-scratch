@@ -14,13 +14,13 @@ class TokenAndPositionEmbedding(nn.Module):
         B = batch size
         T = sequence length
         """
-        batch_size, seq_len = x.size()
+        B, T = x.size()
 
         # Token embeddings
         token_emb = self.token_embedding(x)  # (B, T, C)
 
         # Position indices
-        positions = torch.arange(seq_len, device=x.device)
+        positions = torch.arange(T, device=x.device)
         pos_emb = self.position_embedding(positions)  # (T, C)
 
         # Broadcast position embeddings across batch
