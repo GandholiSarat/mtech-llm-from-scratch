@@ -21,14 +21,20 @@ All code is independently written as part of my M.Tech work.
 - Maintain a clean, well-documented, reproducible codebase
 
 ---
-
 ## Current Status
+
 - Project structure and Git hygiene set up
 - CPU-only PyTorch environment verified
 - Text dataset pipeline with sliding window implemented
-- BPE tokenization using TikToken
-- Embedding layers (next)
-- Transformer blocks and training loop
+- Industry-grade BPE tokenization using TikToken
+- Token and positional embedding layers implemented
+- GPT-2–style multi-head causal self-attention implemented
+- Feedforward (MLP) network implemented
+- Pre-LayerNorm Transformer blocks with residual connections
+- Full GPT-style decoder model assembled (~153M parameters)
+- Autoregressive training loop implemented (CPU-safe configuration)
+- Inference (prompt → text generation) [next]
+
 
 ---
 
