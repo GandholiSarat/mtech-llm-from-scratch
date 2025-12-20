@@ -1,34 +1,24 @@
 import torch
-from tokenizer.tokenizer import TikTokenWrapper
-from data.dataset import TextDataset
 from model.embedding import TokenAndPositionEmbedding
-from model.attention import CausalSelfAttention
+from model.multihead_attention import MultiHeadCausalSelfAttention
+from model.feedforward import FeedForward
 
-def main():
-    with open("data/input.txt", "r", encoding="utf-8") as f:
-        text = f.read()
+B, T = 1, 8
 
-    tokenizer = TikTokenWrapper("gpt2")
-    vocab_size = tokenizer.vocab_size
+x = torch.randint(0, 50257, (B, T))
 
-    dataset = TextDataset(text, tokenizer, context_length=32)
-    x, _ = dataset[0]
-    x = x.unsqueeze(0)  # (B=1, T)
+embed = TokenAndPositionEmbedding(
+    vocab_size=50257,
+    embed_dim=768,
+    context_length=1024
+)
 
-    embedding = TokenAndPositionEmbedding(
-        vocab_size=vocab_size,
-        embed_dim=128,
-        context_length=32
-    )
+attn = MultiHeadCausalSelfAttention(768, 12)
+ffn = FeedForward(768)
 
-    attn = CausalSelfAttention(embed_dim=128)
+x = embed(x)
+x = attn(x)
+x = ffn(x)
 
-    x_emb = embedding(x)
-    out = attn(x_emb)
-
-    print("Embedding shape:", x_emb.shape)
-    print("Attention output shape:", out.shape)
-
-if __name__ == "__main__":
-    main()
+print(x.shape)
 
