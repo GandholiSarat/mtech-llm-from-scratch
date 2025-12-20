@@ -43,6 +43,7 @@ but all code is written independently as part of an M.Tech project.
 
 ## Project Structure
 
+```text
 mtech-llm-from-scratch/
 ├── data/
 │   ├── input.txt
@@ -73,7 +74,7 @@ mtech-llm-from-scratch/
 │   └── day10_inference.md
 ├── requirements.txt
 └── README.md
-
+```
 ---
 
 ## Setup
