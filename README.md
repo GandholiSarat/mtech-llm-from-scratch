@@ -95,7 +95,7 @@ pip install -r requirements.txt
 ## Verify Installation
 
 ```bash
-python training/train.py
+python -m training.test
 ```
 
 Expected:
