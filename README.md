@@ -141,7 +141,7 @@ python -m inference.generate \
 Day-wise technical notes are available in the `notes/` directory.
 Start with:
 
-notes/notes_readme.md
+notes/README.md
 
 ---
 
