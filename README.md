@@ -32,7 +32,7 @@ All code is independently written as part of my M.Tech work.
 - Feedforward (MLP) network implemented
 - Pre-LayerNorm Transformer blocks with residual connections
 - Full GPT-style decoder model assembled (~153M parameters)
-- Autoregressive training loop implemented (CPU-safe configuration)
+- Autoregressive training loop implemented (CPU-safe configuration) [next]
 - Inference (prompt → text generation) [next]
 
 
