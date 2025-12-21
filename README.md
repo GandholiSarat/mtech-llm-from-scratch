@@ -1,16 +1,31 @@
+
 # LLM From Scratch (CPU-First)
 
 This project implements a **GPT-style decoder-only Transformer language model**
-from first principles using **PyTorch**.
+from first principles using **PyTorch**, with a strong emphasis on
+**architectural correctness, numerical fidelity, and debuggability**.
 
-The focus is on:
-- Explicit tensor operations
-- Architectural clarity
-- CPU-first development for correctness and debuggability
-- Understanding how modern LLMs work internally
+The project progresses from:
+- building a GPT model entirely from scratch  
+to:
+- loading **GPT-2 pretrained weights** into the same implementation  
+to:
+- **parameter-efficient fine-tuning** and controlled inference comparison  
 
-This project is inspired by Sebastian Raschka’s *LLMs-from-scratch* repository,
-but all code is written independently as part of an M.Tech project.
+All core model logic (attention, MLP, training, inference) is written manually.
+
+This project is inspired by Sebastian Raschka’s *LLMs-from-scratch*,
+but all code is implemented independently as part of an **M.Tech project**.
+
+---
+
+## Core Focus
+
+- Explicit tensor operations and shape discipline
+- Decoder-only Transformer internals
+- CPU-first development for correctness and debugging
+- Avoiding high-level LLM abstractions
+- Understanding *why* LLMs work, not just *how to use them*
 
 ---
 
@@ -18,26 +33,32 @@ but all code is written independently as part of an M.Tech project.
 
 - Build a GPT-style language model completely from scratch
 - Implement tokenization, attention, training, and inference manually
-- Avoid high-level LLM frameworks (e.g. HuggingFace Trainer)
+- Avoid high-level training frameworks (e.g. HuggingFace Trainer)
 - Maintain a clean, well-documented, interview-ready codebase
-- Enable future comparison with pretrained GPT-2 models
+- Load and run **GPT-2 pretrained weights inside a custom implementation**
+- Compare scratch-trained, pretrained, and fine-tuned models
 
 ---
 
 ## Current Status
 
-- ✅ Project structure and Git hygiene set up
-- ✅ CPU-only PyTorch environment verified
-- ✅ Sliding-window text dataset pipeline implemented
-- ✅ Industry-grade BPE tokenization using TikToken
-- ✅ Token and positional embeddings implemented
-- ✅ GPT-2–style multi-head causal self-attention
-- ✅ Feedforward (MLP) network
-- ✅ Pre-LayerNorm Transformer blocks with residual connections
-- ✅ Full GPT-style decoder model assembled (~152.8M parameters)
-- ✅ Autoregressive training loop (CPU-safe configuration)
-- ✅ CLI-based inference (prompt → text generation)
-- ⏳ Evaluation, sampling improvements, GPT-2 reference comparison (next)
+- Project structure and Git hygiene
+- CPU-only PyTorch environment verified
+- Sliding-window autoregressive dataset pipeline
+- Industry-grade BPE tokenization using TikToken (GPT-2 compatible)
+- Token and positional embeddings
+- GPT-2–style multi-head causal self-attention
+- Feedforward (MLP) network
+- Pre-LayerNorm Transformer blocks with residual connections
+- Full GPT-style decoder model (~152.8M parameters)
+- Autoregressive training loop (CPU-safe)
+- CLI-based inference (prompt → text)
+- Evaluation and debugging utilities
+- Regularization (dropout)
+- **GPT-2 pretrained weight loading**
+- **Numerical fidelity fixes (GELU, LayerNorm eps, weight tying)**
+- **Unified inference for scratch / GPT-2 / fine-tuned GPT-2**
+- **Parameter-efficient GPT-2 fine-tuning**
 
 ---
 
@@ -52,16 +73,24 @@ mtech-llm-from-scratch/
 │   └── tokenizer.py
 ├── model/
 │   ├── embedding.py
+│   ├── attention.py
 │   ├── multihead_attention.py
 │   ├── feedforward.py
 │   ├── transformer_block.py
-│   └── gpt_model.py
+│   ├── gpt_model.py
+│   └── gpt2_compatible.py
 ├── training/
-│   └── train.py
+│   ├── train.py
+│   ├── train_gpt2_finetune.py
+│   └── test.py
 ├── inference/
 │   └── generate.py
+├── tools/
+│   ├── load_gpt2_weights.py
+│   ├── load_gpt2_load.py
+│   └── freeze.py
 ├── notes/
-│   ├── notes_readme.md
+│   ├── README.md
 │   ├── day01_setup.md
 │   ├── day02_dataset.md
 │   ├── day03_tokenizer.md
@@ -71,10 +100,14 @@ mtech-llm-from-scratch/
 │   ├── day07_transformer_block.md
 │   ├── day08_full_gpt_model.md
 │   ├── day09_training_loop.md
-│   └── day10_inference.md
+│   ├── day10_inference.md
+│   ├── day11_evaluation_debugging.md
+│   ├── day14_regularization.md
+│   └── Post_Day14_GPT2_Integration.md
 ├── requirements.txt
 └── README.md
 ```
+
 ---
 
 ## Setup
@@ -105,10 +138,7 @@ Expected:
 
 ---
 
-## Training (CPU-Safe)
-
-A smaller configuration is used for CPU training
-to verify correctness.
+## Training (From Scratch, CPU-Safe)
 
 ```bash
 python -m training.train
@@ -118,53 +148,44 @@ python -m training.train
 
 ## Inference (Prompt → Text)
 
-### Sampling mode
+### Scratch-trained model
 ```bash
-python -m inference.generate \
-  --prompt "Machine learning is" \
-  --max_new_tokens 50 \
-  --temperature 0.8
+python -m inference.generate   --prompt "Learning is"   --top_p 0.9   --temperature 0.8
 ```
 
-### Greedy mode
+### GPT-2 pretrained
 ```bash
-python -m inference.generate \
-  --prompt "Machine learning is" \
-  --max_new_tokens 50 \
-  --greedy
+python -m inference.generate   --prompt "Learning is"   --use_gpt2   --top_p 0.9   --temperature 0.8
+```
+
+### GPT-2 fine-tuned
+```bash
+python -m inference.generate   --prompt "Learning is"   --use_gpt2   --finetuned   --top_p 0.9   --temperature 0.7   --max_new_tokens 100
 ```
 
 ---
 
 ## Notes & Documentation
 
-Day-wise technical notes are available in the `notes/` directory.
-Start with:
+Detailed technical notes are available in:
 
+```
 notes/README.md
+```
 
 ---
 
 ## Limitations
 
-- Small training dataset
-- Limited training epochs
+- Small fine-tuning dataset
+- CPU-only training
 - No instruction tuning or RLHF
-
----
-
-## Planned Extensions
-
-- GPT-2 reference weight integration
-- Output comparison with pretrained models
-- Top-k / top-p sampling
-- Performance benchmarking
-- Optional GPU support
+- No distributed training
 
 ---
 
 ## Key Takeaway
 
-This project demonstrates a **full GPT-style language model pipeline**
-—from raw text to tokenization, attention, training, and inference—
-implemented entirely from scratch with a focus on understanding and correctness.
+This project demonstrates a **complete, end-to-end GPT-style LLM pipeline**
+implemented from scratch and extended to support **pretrained GPT-2 loading
+and fine-tuning**, reflecting real-world LLM engineering practices.
