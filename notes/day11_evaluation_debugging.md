@@ -181,7 +181,7 @@ These are expected behaviors.
 
 ---
 
-## Interview-Critical Q&A
+## Q&A
 
 **Q: How do you verify a language model is correct?**  
 A: Loss sanity checks, token range validation, and overfitting tests.
