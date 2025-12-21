@@ -22,7 +22,12 @@ class TextDataset(Dataset):
         tokenizer: object with encode() method
         context_length: number of tokens in input
         """
-        self.tokens = tokenizer.encode(text)
+        #self.tokens = tokenizer.encode(text)
+        self.tokens = torch.tensor(
+            tokenizer.encode(text),
+            dtype=torch.long
+        )
+
         self.context_length = context_length
 
     def __len__(self):
@@ -32,5 +37,5 @@ class TextDataset(Dataset):
         x = self.tokens[idx : idx + self.context_length]
         y = self.tokens[idx + 1 : idx + self.context_length + 1]
 
-        return torch.tensor(x), torch.tensor(y)
+        return x,y
 

@@ -75,6 +75,16 @@ def main():
 
             total_loss += loss.item()
 
+            '''print("x min/max:", x.min().item(), x.max().item())
+            print("y min/max:", y.min().item(), y.max().item())
+            print("vocab size:", tokenizer.vocab_size)
+            print("logits mean/std:",
+                    logits.mean().item(),
+                    logits.std().item())
+
+            break
+            '''
+
             if step % 50 == 0:
                 print(
                     f"Epoch {epoch} | Step {step} | Loss {loss.item():.4f}"
