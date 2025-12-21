@@ -1,13 +1,14 @@
 # LLM From Scratch — Notes Index
 
-This directory contains day-wise technical notes documenting
-the design, implementation, and reasoning behind each stage
-of building a GPT-style language model from scratch.
+This directory contains **day-wise and milestone-wise technical notes**
+documenting the design, implementation, debugging, and reasoning behind
+building a **GPT-style language model from scratch** in PyTorch.
 
 The notes are written for:
 - future self-review
 - interview preparation
 - architectural clarity
+- demonstrating end-to-end LLM engineering depth
 
 ---
 
@@ -63,7 +64,7 @@ The notes are written for:
 **File:** day06_multihead_attention_ffn.md  
 - Multi-head attention motivation
 - Head dimension splitting
-- GPT-2 style QKV projection
+- GPT-2 style single QKV projection
 - Feedforward (MLP) network
 - Parameter scaling analysis (~150M+)
 
@@ -95,7 +96,7 @@ The notes are written for:
 - Cross-entropy loss
 - AdamW optimizer
 - CPU-safe training configuration
-- Loss sanity checks
+- Loss sanity checks and debugging
 
 ---
 
@@ -109,23 +110,90 @@ The notes are written for:
 
 ---
 
-## How to Read These Notes
-
-Suggested order:
-1. Day 1 → Day 5 for fundamentals
-2. Day 6 → Day 8 for architecture
-3. Day 9 for training mechanics
-4. Day 10 for end-to-end inference
-
-Reading these sequentially should enable you to
-reconstruct the entire model from scratch.
+### Day 11 — Evaluation & Debugging
+**File:** day11_evaluation_debugging.md  
+- Logits inspection
+- Loss behavior analysis
+- Dataset sanity checks
+- Diagnosing repetition and collapse
+- Practical debugging workflow
 
 ---
 
-## Future Extensions (Planned)
+### Day 14 — Regularization
+**File:** day14_regularization.md  
+- Dropout placement (attention, FFN, embeddings)
+- Why regularization matters in Transformers
+- Training vs inference behavior
+- Stability improvements
 
-- GPT-2 reference weight integration
-- Output comparison with pretrained models
-- Top-k / top-p sampling
-- Performance benchmarking
+---
 
+## Post–Day 14: Advanced Extensions (Major Milestone)
+
+### GPT-2 Integration, Weight Loading & Fine-Tuning
+**File:** post_day14_notes.md  
+
+This document covers **everything done after Day 14**, including:
+
+- Making the model **GPT-2 compatible**
+- Loading GPT-2 pretrained weights into a custom implementation
+- Handling transposed linear weights
+- Positional embedding shape alignment
+- Weight tying (token embedding ↔ LM head)
+- Numerical fidelity fixes:
+  - GPT-2 GELU approximation
+  - LayerNorm epsilon matching
+  - Dropout disabling during inference
+- Unified inference CLI:
+  - scratch-trained model
+  - GPT-2 pretrained
+  - GPT-2 fine-tuned
+- Freezing GPT-2 and parameter-efficient fine-tuning
+- Behavioral comparison across models
+- Interview-ready technical takeaways
+
+This marks the transition from **educational implementation** to
+**industry-grade LLM engineering**.
+
+---
+
+## How to Read These Notes
+
+Suggested reading order:
+
+1. **Day 1 → Day 5**  
+   Fundamentals: data, tokenization, attention
+
+2. **Day 6 → Day 8**  
+   Core architecture and scaling
+
+3. **Day 9 → Day 10**  
+   Training and inference end-to-end
+
+4. **Day 11 & Day 14**  
+   Debugging and regularization
+
+5. **Post–Day 14 Notes**  
+   Pretrained models, weight loading, fine-tuning, and comparison
+
+Reading sequentially should enable you to:
+- rebuild the model from scratch
+- reason about architectural choices
+- explain design trade-offs in interviews
+
+---
+
+## Project Maturity Summary
+
+By the end of these notes, the project demonstrates:
+
+- GPT model built from first principles
+- Training from scratch on custom data
+- GPT-2 pretrained weight integration
+- Numerical equivalence debugging
+- Parameter-efficient fine-tuning
+- Unified inference and comparison tooling
+
+This goes **well beyond a typical academic assignment** and reflects
+real-world LLM engineering practices.
