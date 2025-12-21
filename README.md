@@ -7,9 +7,7 @@ from first principles using **PyTorch**, with a strong emphasis on
 
 The project progresses from:
 - building a GPT model entirely from scratch  
-to:
 - loading **GPT-2 pretrained weights** into the same implementation  
-to:
 - **parameter-efficient fine-tuning** and controlled inference comparison  
 
 All core model logic (attention, MLP, training, inference) is written manually.
@@ -142,6 +140,7 @@ Expected:
 
 ```bash
 python -m training.train
+python -m training.train_gpt2_finetune
 ```
 
 ---
