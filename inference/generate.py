@@ -4,19 +4,21 @@ import torch.nn.functional as F
 
 from tokenizer.tokenizer import TikTokenWrapper
 from model.gpt_model import GPTModel
+from tools.load_gpt2_weights import load_gpt2_weights
 
 # --------------------
 # Inference config
 # --------------------
 DEVICE = "cpu"
 
-# Must match trained model
-EMBED_DIM = 256
-NUM_HEADS = 4
-NUM_LAYERS = 4
-CONTEXT_LEN = 128
+# Small trained model config
+SMALL_EMBED_DIM = 256
+SMALL_NUM_HEADS = 4
+SMALL_NUM_LAYERS = 4
+SMALL_CONTEXT_LEN = 128
 
-MODEL_PATH = "trained_small_gpt.pt"
+SMALL_MODEL_PATH = "trained_small_gpt.pt"
+GPT2_FINETUNED_PATH = "gpt2_finetuned.pt"
 
 
 # --------------------
@@ -29,12 +31,11 @@ def top_k_filtering(logits, k):
     values, _ = torch.topk(logits, k)
     min_values = values[:, -1].unsqueeze(-1)
 
-    logits = torch.where(
+    return torch.where(
         logits < min_values,
         torch.full_like(logits, float("-inf")),
         logits
     )
-    return logits
 
 
 def top_p_filtering(logits, p):
@@ -53,8 +54,8 @@ def top_p_filtering(logits, p):
     cutoff[..., 0] = False
 
     sorted_logits[cutoff] = float("-inf")
-
     logits.scatter_(1, sorted_indices, sorted_logits)
+
     return logits
 
 
@@ -64,6 +65,7 @@ def top_p_filtering(logits, p):
 def generate(
     model,
     input_ids,
+    context_len,
     max_new_tokens,
     temperature=1.0,
     greedy=False,
@@ -73,12 +75,12 @@ def generate(
     model.eval()
 
     for _ in range(max_new_tokens):
-        input_cond = input_ids[:, -CONTEXT_LEN:]
+        input_cond = input_ids[:, -context_len:]
 
         with torch.no_grad():
             logits = model(input_cond)
 
-        logits = logits[:, -1, :]  # last token
+        logits = logits[:, -1, :]
 
         if greedy:
             next_token = torch.argmax(logits, dim=-1, keepdim=True)
@@ -102,55 +104,75 @@ def main():
     parser = argparse.ArgumentParser(
         description="GPT-style text generation"
     )
+
+    parser.add_argument("--prompt", type=str, required=True)
+    parser.add_argument("--max_new_tokens", type=int, default=50)
+    parser.add_argument("--temperature", type=float, default=1.0)
+    parser.add_argument("--greedy", action="store_true")
+    parser.add_argument("--top_k", type=int, default=None)
+    parser.add_argument("--top_p", type=float, default=None)
+
     parser.add_argument(
-        "--prompt", type=str, required=True,
-        help="Input prompt text"
+        "--use_gpt2",
+        action="store_true",
+        help="Use GPT-2 pretrained weights"
     )
     parser.add_argument(
-        "--max_new_tokens", type=int, default=50,
-        help="Number of tokens to generate"
-    )
-    parser.add_argument(
-        "--temperature", type=float, default=1.0,
-        help="Sampling temperature"
-    )
-    parser.add_argument(
-        "--greedy", action="store_true",
-        help="Use greedy decoding"
-    )
-    parser.add_argument(
-        "--top_k", type=int, default=None,
-        help="Top-k sampling"
-    )
-    parser.add_argument(
-        "--top_p", type=float, default=None,
-        help="Top-p (nucleus) sampling"
+        "--finetuned",
+        action="store_true",
+        help="Use fine-tuned GPT-2 weights (requires --use_gpt2)"
     )
 
     args = parser.parse_args()
 
     tokenizer = TikTokenWrapper("gpt2")
 
-    model = GPTModel(
-        vocab_size=tokenizer.vocab_size,
-        context_length=CONTEXT_LEN,
-        embed_dim=EMBED_DIM,
-        num_heads=NUM_HEADS,
-        num_layers=NUM_LAYERS
-    ).to(DEVICE)
+    # --------------------
+    # Model loading logic
+    # --------------------
+    if args.use_gpt2:
+        print("Loading GPT-2 pretrained weights...")
+        model = load_gpt2_weights().to(DEVICE)
 
-    model.load_state_dict(
-        torch.load(MODEL_PATH, map_location=DEVICE)
-    )
+        if args.finetuned:
+            print("Loading fine-tuned GPT-2 weights...")
+            model.load_state_dict(
+                torch.load(GPT2_FINETUNED_PATH, map_location=DEVICE),
+                strict=False,
+            )
 
+        context_len = 1024
+
+    else:
+        model = GPTModel(
+            vocab_size=tokenizer.vocab_size,
+            context_length=SMALL_CONTEXT_LEN,
+            embed_dim=SMALL_EMBED_DIM,
+            num_heads=SMALL_NUM_HEADS,
+            num_layers=SMALL_NUM_LAYERS,
+        ).to(DEVICE)
+
+        model.load_state_dict(
+            torch.load(SMALL_MODEL_PATH, map_location=DEVICE)
+        )
+
+        context_len = SMALL_CONTEXT_LEN
+
+    # --------------------
+    # Encode prompt
+    # --------------------
     input_ids = torch.tensor(
         [tokenizer.encode(args.prompt)],
         dtype=torch.long
     ).to(DEVICE)
 
+    # --------------------
+    # Generate
+    # --------------------
     output_ids = generate(
         model=model,
         input_ids=input_ids,
+        context_len=context_len,
         max_new_tokens=args.max_new_tokens,
         temperature=args.temperature,
         greedy=args.greedy,

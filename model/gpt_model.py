@@ -10,7 +10,8 @@ class GPTModel(nn.Module):
         context_length,
         embed_dim,
         num_heads,
-        num_layers
+        num_layers,
+        dropout=0.1,
     ):
         super().__init__()
 
@@ -20,17 +21,24 @@ class GPTModel(nn.Module):
         self.embeddings = TokenAndPositionEmbedding(
             vocab_size=vocab_size,
             embed_dim=embed_dim,
-            context_length=context_length
+            context_length=context_length,
+            dropout=dropout,
         )
 
         # Transformer blocks
         self.blocks = nn.ModuleList([
-            TransformerBlock(embed_dim, num_heads)
+             TransformerBlock(
+                embed_dim=embed_dim,
+                num_heads=num_heads,
+                max_context=context_length,
+                dropout=dropout,
+            )
             for _ in range(num_layers)
         ])
 
         # Final LayerNorm (GPT-2 style)
-        self.ln_f = nn.LayerNorm(embed_dim)
+        self.ln_f = nn.LayerNorm(embed_dim, eps=1e-5)
+        #self.ln_f = nn.LayerNorm(embed_dim)
 
         # Language modeling head
         self.lm_head = nn.Linear(embed_dim, vocab_size, bias=False)
