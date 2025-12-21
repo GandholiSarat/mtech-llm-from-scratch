@@ -20,7 +20,7 @@ class FeedForward(nn.Module):
 
         self.net = nn.Sequential(
             nn.Linear(embed_dim, 4 * embed_dim),
-            GPT2GELU(),                    # 🔥 critical
+            GPT2GELU(),                    # critical
             nn.Linear(4 * embed_dim, embed_dim),
             nn.Dropout(dropout),
         )
