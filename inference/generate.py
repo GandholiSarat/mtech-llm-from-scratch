@@ -72,7 +72,7 @@ def generate(
     top_k=None,
     top_p=None,
 ):
-    model.eval()
+    model.eval() # To Drop out Randomness during inference
 
     for _ in range(max_new_tokens):
         input_cond = input_ids[:, -context_len:]
