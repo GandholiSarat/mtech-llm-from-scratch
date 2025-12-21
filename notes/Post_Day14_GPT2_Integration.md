@@ -287,7 +287,7 @@ This is **well beyond a typical academic project**.
 
 ---
 
-## 13. Interview Key Takeaways (Memorize)
+## 13.Key Takeaways
 
 - “I implemented GPT from scratch and loaded GPT-2 weights into my model.”
 - “I handled transposed linear weights and embedding tying.”
