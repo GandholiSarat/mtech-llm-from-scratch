@@ -95,7 +95,7 @@ These are **desired outcomes**, not regressions.
 
 ---
 
-## Interview-Critical Q&A
+## Q&A
 
 **Q: Why use dropout in Transformers?**  
 A: To prevent co-adaptation and improve generalization, especially in high-capacity layers.
