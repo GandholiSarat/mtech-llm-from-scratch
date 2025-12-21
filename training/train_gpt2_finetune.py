@@ -14,7 +14,7 @@ DEVICE = "cpu"
 BATCH_SIZE = 2
 CONTEXT_LEN = 128
 EPOCHS = 2
-LR = 5e-5   # 🔥 small LR for finetuning
+LR = 5e-5   #  small LR for finetuning
 
 # --------------------
 # Training
